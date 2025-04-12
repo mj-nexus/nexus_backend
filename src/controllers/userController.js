@@ -2,6 +2,7 @@ const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const UserProfile = require("../models/profileModel")
 
 // 회원가입 (INSERT)
 exports.registerUser = async (req, res) => {
@@ -80,8 +81,8 @@ exports.getAllUsers = async (req, res) => {
 // 특정 사용자 조회 (SELECT WHERE)
 exports.getUserById = async (req, res) => {
     try {
-        const { student_id } = req.params;
-        const user = await User.findByPk(student_id);
+        const { user_id } = req.params;
+        const user = await UserProfile.findByPk(user_id);
 
         if (!user) {
             return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
