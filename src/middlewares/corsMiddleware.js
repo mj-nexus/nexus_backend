@@ -1,8 +1,8 @@
 const cors = require("cors");
 
 const corsMiddleware = cors({
-    origin: "*", // 모든 도메인 허용
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "http://localhost:3000/",
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
 });
 

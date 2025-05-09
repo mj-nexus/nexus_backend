@@ -40,6 +40,14 @@ const User = sequelize.define("User", {
     },
     skill: {
         type: DataTypes.JSON
+    },
+    lastReadMessageId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    onlineStatus: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true
     }
 }, {
     tableName: "users",

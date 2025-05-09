@@ -81,8 +81,14 @@ exports.getAllUsers = async (req, res) => {
 // 특정 사용자 조회 (SELECT WHERE)
 exports.getUserById = async (req, res) => {
     try {
-        const { user_id } = req.params;
-        const user = await UserProfile.findByPk(user_id);
+        const { user_id } = req.params
+        const user = await User.findOne({
+            where: { user_id },
+            include: [{
+                model: UserProfile,
+                required: false  // left outer join
+            }]
+        });
 
         if (!user) {
             return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
@@ -93,26 +99,57 @@ exports.getUserById = async (req, res) => {
         res.status(500).json({ message: "사용자 조회 실패", error: error.message });
     }
 };
-
 // 사용자 정보 수정 (UPDATE)
 exports.updateUser = async (req, res) => {
     try {
-        const { student_id } = req.params;
-        const { username, email } = req.body;
+        const { user_id } = req.params;  // user_id로 요청 받음
+        const { name, email, company, phone, skill } = req.body;
 
-        const user = await User.findByPk(student_id);
+        console.log('📥 요청 도착 - user_id:', user_id);
+        console.log('📦 요청 바디:', req.body);
+
+        // user_id 기준으로 사용자 찾기
+        const user = await User.findByPk(user_id);
+        console.log(user);
         if (!user) {
+            console.log('❌ 사용자 없음:', user_id);
             return res.status(404).json({ message: "사용자를 찾을 수 없습니다." });
         }
 
-        // 정보 업데이트
-        await User.update({ username, email }, { where: { student_id } });
+        const originalData = user.toJSON();
+        console.log('📂 기존 사용자 정보:', originalData);
 
+        const updateData = {};
+        if (name !== undefined && name !== originalData.name) updateData.name = name;
+        if (email !== undefined && email !== originalData.email) updateData.email = email;
+        if (company !== undefined && company !== originalData.company) updateData.company = company;
+        if (phone !== undefined && phone !== originalData.phone) updateData.phone = phone;
+        if (skill !== undefined && JSON.stringify(skill) !== JSON.stringify(originalData.skill)) updateData.skill = skill;
+
+        console.log('🛠️ 변경된 필드:', updateData);
+
+        if (Object.keys(updateData).length === 0) {
+            console.log('⚠️ 변경 사항 없음 (모든 값이 기존과 동일)');
+            return res.status(400).json({ message: "업데이트할 내용이 없습니다." });
+        }
+
+        const [affectedRows] = await User.update(updateData, { where: { user_id } });
+
+        if (affectedRows === 0) {
+            console.log('⚠️ 업데이트 실패 - 영향 받은 행 없음');
+            return res.status(400).json({ message: "업데이트 실패 (행이 변경되지 않음)" });
+        }
+
+        console.log('✅ 사용자 정보 수정 완료:', user_id);
         res.json({ message: "사용자 정보 수정 완료" });
+
     } catch (error) {
+        console.error('🔥 사용자 정보 수정 실패:', error.message);
         res.status(500).json({ message: "사용자 정보 수정 실패", error: error.message });
     }
 };
+
+
 
 // 사용자 삭제 (DELETE)
 exports.deleteUser = async (req, res) => {

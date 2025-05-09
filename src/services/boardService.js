@@ -12,6 +12,17 @@ exports.getBoardById = async (id) => {
   return await Board.findByPk(id);
 };
 
+exports.getUserBoards = async (userId) => {
+  return await Board.findAll({
+    where: {
+      writer_id: userId
+    },
+    order: [
+        ['regdate', 'DESC']
+    ]
+  });
+};
+
 exports.deleteBoard = async (id) => {
   const board = await Board.findByPk(id);
   if (!board) return null;

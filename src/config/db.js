@@ -22,5 +22,11 @@ const sequelize = new Sequelize(
 sequelize.authenticate()
   .then(() => console.log("✅ MariaDB 연결 성공!"))
   .catch(err => console.error("❌ MariaDB 연결 실패:", err));
-
+sequelize.sync({ force: false })
+    .then(() => {
+        console.log('Database & tables created!');
+    })
+    .catch(err => {
+        console.error('Unable to create table:', err);
+    });
 module.exports = sequelize;

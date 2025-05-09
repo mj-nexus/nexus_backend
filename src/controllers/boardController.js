@@ -1,4 +1,5 @@
 const boardService = require('../services/boardService');
+const {getUserById} = require("./userController");
 
 exports.createBoard = async (req, res) => {
   try {
@@ -27,6 +28,22 @@ exports.getBoard = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getUserBoards = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const board = await boardService.getUserBoards(userId);
+    if (!board || board.length === 0) {
+      return res.status(404).json({
+        message: "해당 사용자의 게시글이 없습니다."
+      });
+    }
+
+    res.json(board);
+  } catch (err) {
+    throw err;
+  }
+}
 
 exports.deleteBoard = async (req, res) => {
   try {

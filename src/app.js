@@ -8,8 +8,9 @@ const logger = require("./middlewares/logger");
 const { sequelize } = require("./models");
 const path = require('path');
 
-app.use(express.json());
+
 app.use(corsMiddleware);
+app.use(express.json());
 app.use(logger);
 app.use(errorHandler);
 
