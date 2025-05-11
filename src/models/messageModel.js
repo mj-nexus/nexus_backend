@@ -8,7 +8,7 @@ const Message = sequelize.define("Message", {
         primaryKey: true,
         autoIncrement: true,
     },
-    message: {
+    content: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -16,14 +16,14 @@ const Message = sequelize.define("Message", {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    receiveId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    timestamp: {
+    sent_at: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW,
+    },
+    message_type: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
     }
 },
     {
