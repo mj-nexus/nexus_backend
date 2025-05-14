@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 
-const Message = sequelize.define("Message", {
+const chat_room_usersModel = sequelize.define("chat_room_users", {
     id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -12,28 +12,20 @@ const Message = sequelize.define("Message", {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    content: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    sender_id: {
+    user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-    sent_at: {
+    joined_at: {
         type: DataTypes.DATE,
-        allowNull: false,
         defaultValue: DataTypes.NOW,
-    },
-    message_type: {
-        type: DataTypes.STRING(10),
         allowNull: false,
     }
 },
     {
-        tableName: "message",
+        tableName: "chat_room_users",
         timestamps: false,
-        createdAt: false,
-        updatedAt: false,
+        createdAt: true,
+        updatedAt: true,
     })
-module.exports = Message;
+module.exports = chat_room_usersModel

@@ -28,8 +28,19 @@ const sendVerificationCode = async (req, res, next) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: 'Your Verification Code',
-      text: `Your verification code is: ${verificationCode}`,
+      html: `
+    <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 400px; margin: auto;">
+      <h2 style="color: #2c3e50;">🔐 이메일 인증 코드</h2>
+      <p>안녕하세요,</p>
+      <p>아래의 인증 코드를 입력해 주세요:</p>
+      <div style="font-size: 24px; font-weight: bold; background: #f1f1f1; padding: 10px; border-radius: 5px; text-align: center; margin: 20px 0;">
+        ${verificationCode}
+      </div>
+      <p style="font-size: 12px; color: #999;">이 코드는 5분간만 유효합니다.</p>
+    </div>
+  `,
     };
+
 
     await transporter.sendMail(mailOptions);
     

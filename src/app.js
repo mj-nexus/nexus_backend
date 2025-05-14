@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const userRoutes = require('./routes/userRoutes');
 const boardRoutes = require('./routes/boardRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const corsMiddleware = require("./middlewares/corsMiddleware");
 const logger = require("./middlewares/logger");
@@ -18,6 +19,7 @@ app.use('/upload', express.static(path.join(__dirname, 'uploads')))
 
 app.use('/api/user', userRoutes);
 app.use('/board', boardRoutes);
+app.use('/api/messages', messageRoutes);
 
 sequelize.sync()
     .then(() => {
