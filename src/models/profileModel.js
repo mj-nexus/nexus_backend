@@ -1,16 +1,11 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
-const User = require("./userModel");
 
 const Profile = sequelize.define("Profile", {
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
-        references: {
-            model: User,
-            key: 'user_id'
-        }
     },
     user_name: {
         type: DataTypes.STRING(4), 
@@ -18,7 +13,7 @@ const Profile = sequelize.define("Profile", {
     },
     nick_name: {
         type: DataTypes.STRING(20), 
-        allowNull: false,
+        allowNull: true,
         defaultValue: ""
     },
     profile_image: {
@@ -27,10 +22,30 @@ const Profile = sequelize.define("Profile", {
     },
     bio: {
         type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: "안녕하세요 잘부탁드려요"
+    },
+    email: {
+        type: DataTypes.STRING(128),
+        allowNull: false,
+        validate: {
+            isEmail: true
+        }
+    },
+    company: {
+        type: DataTypes.STRING(20),
         allowNull: true
-    }
+    },
+    skill: {
+        type: DataTypes.JSON
+    },
+    phone: {
+        type: DataTypes.STRING(15),
+        allowNull: false
+    },
 }, {
-    tableName: "user_profiles"
+    tableName: "user_profiles",
+    timestamps: false,
 });
 
 module.exports = Profile;

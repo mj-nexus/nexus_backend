@@ -17,4 +17,16 @@ router.get("/user/:userId/rooms", messageController.getMessageRoomId);
 // 채팅방 ID로 상세 정보 조회 (GET /api/messages/room-info/:roomId)
 router.get("/room-info/:roomId", messageController.getMessageInfo);
 
+// 새로운 채팅방 생성 (POST /api/messages/chat-room)
+router.post("/chat-room", messageController.createChatRoom);
+
+// 채팅방 사용자 목록 조회 (GET /api/messages/chat-room/:roomId/users)
+router.get("/chat-room/:roomId/users", messageController.getChatRoomUsers);
+
+// 사용자가 참여한 모든 채팅방 목록 조회 (GET /api/messages/user/:userId/chat-rooms)
+router.get("/user/:userId/chat-rooms", messageController.getUserChatRooms);
+
+// 채팅방 삭제 (DELETE /api/messages/chat-room/:roomId)
+router.delete("/chat-room/:roomId", messageController.deleteChatRoom);
+
 module.exports = router;

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const ChatRoomsModel = sequelize.define('ChatRoomsModel', {
+const ChatRoomsModel = sequelize.define('chat_rooms', {
     id: {
         type: DataTypes.INTEGER,
         allowNull: false,

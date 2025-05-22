@@ -1,21 +1,32 @@
+// models/index.js
+const Sequelize = require("sequelize");
 const sequelize = require("../config/db");
 
 const User = require("./userModel");
-const Board = require("./boardModel");
 const Profile = require("./profileModel");
 const Message = require("./messageModel");
-const chat_rooms = require("./chat_roomsModel");
+const Board = require("./boardModel");
+const Notice = require("./Post");
+const ChatRoomsModel = require("./chat_roomsModel");
 const chat_room_users = require("./chat_room_usersModel");
+const MjcNotice = require("./mjcNoticeModel");
+const Comment = require("./commentModel");
+const SeniorBoard = require("./SeniorBoard")(sequelize);
+const SeniorBoardLike = require("./SeniorBoardLike")(sequelize);
 
 
 // Board - User (1:N)
 User.hasMany(Board, {
     foreignKey: 'writer_id',
-    sourceKey: 'user_id'
+    sourceKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 Board.belongsTo(User, {
     foreignKey: 'writer_id',
-    targetKey: 'user_id'
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 // User - Profile (1:1)
@@ -27,7 +38,9 @@ User.hasOne(Profile, {
 });
 Profile.belongsTo(User, {
     foreignKey: 'user_id',
-    targetKey: 'user_id'
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 // User - chat_room_users (1:N)
@@ -39,31 +52,37 @@ User.hasMany(chat_room_users, {
 });
 chat_room_users.belongsTo(User, {
     foreignKey: 'user_id',
-    targetKey: 'user_id'
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 // chat_rooms - chat_room_users (1:N)
-chat_rooms.hasMany(chat_room_users, {
+ChatRoomsModel.hasMany(chat_room_users, {
     foreignKey: 'chat_room_id',
     sourceKey: 'id',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
-chat_room_users.belongsTo(chat_rooms, {
+chat_room_users.belongsTo(ChatRoomsModel, {
     foreignKey: 'chat_room_id',
-    targetKey: 'id'
+    targetKey: 'id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 // chat_rooms - Message (1:N)
-chat_rooms.hasMany(Message, {
+ChatRoomsModel.hasMany(Message, {
     foreignKey: 'chat_room_id',
     sourceKey: 'id',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
-Message.belongsTo(chat_rooms, {
+Message.belongsTo(ChatRoomsModel, {
     foreignKey: 'chat_room_id',
-    targetKey: 'id'
+    targetKey: 'id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
 // User - Message (1:N)
@@ -75,15 +94,67 @@ User.hasMany(Message, {
 });
 Message.belongsTo(User, {
     foreignKey: 'sender_id',
-    targetKey: 'user_id'
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
 });
 
-module.exports = {
+// SeniorBoard - User (1:N)
+User.hasMany(SeniorBoard, {
+    foreignKey: 'writer_id',
+    sourceKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+SeniorBoard.belongsTo(User, {
+    foreignKey: 'writer_id',
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+// SeniorBoard - SeniorBoardLike (1:N)
+SeniorBoard.hasMany(SeniorBoardLike, {
+    foreignKey: 'board_id',
+    sourceKey: 'id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+SeniorBoardLike.belongsTo(SeniorBoard, {
+    foreignKey: 'board_id',
+    targetKey: 'id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+// User - SeniorBoardLike (1:N)
+User.hasMany(SeniorBoardLike, {
+    foreignKey: 'user_id',
+    sourceKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+SeniorBoardLike.belongsTo(User, {
+    foreignKey: 'user_id',
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+
+const db = {
     sequelize,
+    Sequelize,
     User,
-    Board,
     Profile,
     Message,
-    chat_rooms,
-    chat_room_users
+    Board,
+    Notice,
+    ChatRoomsModel,
+    chat_room_users,
+    MjcNotice,
+    Comment,
+    SeniorBoard,
+    SeniorBoardLike
 };
+
+module.exports = db;

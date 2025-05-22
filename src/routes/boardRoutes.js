@@ -4,6 +4,7 @@ const boardController = require('../controllers/boardController');
 
 router.post('/', boardController.createBoard);
 router.get('/', boardController.getBoards);
+router.get('/search', boardController.searchBoards);
 router.get('/:id', boardController.getBoard);
 router.get('/my/:userId', boardController.getUserBoards);
 router.delete('/:id', boardController.deleteBoard);
