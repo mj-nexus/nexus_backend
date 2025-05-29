@@ -2,23 +2,14 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
 
-// 여러 도메인을 배열로 변환
-const allowedOrigins = process.env.FRONTEND_URLS
-  ? process.env.FRONTEND_URLS.split(',').map(url => url.trim())
-  : ["http://localhost:3000"]; // 기본값
+// 프론트엔드 URL이 환경 변수에 없을 경우 기본값 사용
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const corsMiddleware = cors({
-  origin: function (origin, callback) {
-    // origin이 undefined인 경우도 허용 (예: 서버 간 통신)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS 정책에 의해 차단된 origin: ${origin}`));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+    origin: frontendUrl, // 하드코딩 또는 환경 변수 사용
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // PATCH 반드시 포함!
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'] // * 절대 쓰지 말고 명시적으로!
 });
 
 module.exports = corsMiddleware;
