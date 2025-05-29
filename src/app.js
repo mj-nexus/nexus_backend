@@ -5,10 +5,12 @@ const boardRoutes = require('./routes/boardRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const mjcNoticeRoutes = require('./routes/mjcNoticeRoutes');
 const commentRoutes = require('./routes/commentRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const corsMiddleware = require("./middlewares/corsMiddleware");
 const logger = require("./middlewares/logger");
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const cronService = require('./services/cronService');
 const seniorBoardRoutes = require('./routes/seniorBoardRoutes');
 
@@ -19,6 +21,7 @@ app.options("*", corsMiddleware); // preflight 요청을 명확히 처리
 
 // 다른 미들웨어 및 라우터 설정
 app.use(express.json());
+app.use(cookieParser());
 app.use(logger);
 app.use(errorHandler);
 
@@ -30,6 +33,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/mjc-notices', mjcNoticeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/senior-board', seniorBoardRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // 크론 작업 초기화
 cronService.initCronJobs();

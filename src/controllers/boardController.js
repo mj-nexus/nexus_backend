@@ -99,7 +99,9 @@ exports.getBoard = async (req, res) => {
   try {
     const board = await boardService.getBoardById(req.params.id);
     if (!board) return res.status(404).json({ error: '게시글을 찾을 수 없습니다.' });
-    
+    // 조회수 증가
+    board.views += 1;
+    await board.save();
     res.json(board);
   } catch (err) {
     console.error('게시글 상세 조회 오류:', err);

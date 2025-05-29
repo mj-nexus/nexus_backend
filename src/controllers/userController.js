@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { User, Profile } = require("../models/");
 const path = require('path');
-const { userRegister, profileRegister, existingUser, userLogin, getUserProfile, getUserProfilesById } = require("../services/authService");
+const { userRegister, profileRegister, existingUser, userLogin, getUserProfile, getUserProfilesById, getUsersOnlineStatus } = require("../services/authService");
 
 // 회원가입 (INSERT)
 exports.registerUser = async (req, res) => {
@@ -66,6 +66,9 @@ exports.loginUser = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ message: "이메일 또는 비밀번호가 올바르지 않습니다." });
         }
+
+        // 온라인 상태 업데이트
+        await User.update({ onlineStatus: true }, { where: { student_id } });
 
         // 비밀번호 검증 성공 후, 프로필 정보가 포함된 사용자 정보 조회
         const user = await userLogin({ where: { student_id } });
@@ -279,6 +282,124 @@ exports.uploadProfileImage = async (req, res) => {
         return res.status(500).json({
             success: false,
             error: '프로필 이미지 업로드 중 오류가 발생했습니다.',
+            message: error.message
+        });
+    }
+};
+
+/**
+ * 로그아웃 
+ * @route POST /api/user/logout
+ * @param {object} req - 요청 객체
+ * @param {object} res - 응답 객체
+ * @returns {object} 로그아웃 결과
+ */
+exports.logoutUser = async (req, res) => {
+    try {
+        // 토큰에서 사용자 정보 가져오기
+        const { student_id } = req.user;
+        
+        if (!student_id) {
+            return res.status(400).json({ error: '사용자 정보가 필요합니다.' });
+        }
+
+        // 사용자 온라인 상태 업데이트
+        await User.update(
+            { onlineStatus: false },
+            { where: { student_id } }
+        );
+
+        // 쿠키 삭제
+        res.clearCookie('refreshToken');
+
+        return res.status(200).json({
+            success: true,
+            message: '로그아웃 되었습니다.'
+        });
+    } catch (error) {
+        console.error('🔥 로그아웃 실패:', error.message);
+        return res.status(500).json({
+            success: false,
+            error: '로그아웃 중 오류가 발생했습니다.',
+            message: error.message
+        });
+    }
+};
+
+/**
+ * 사용자 온라인 상태 조회
+ * @route GET /api/user/online-status
+ * @returns {Array} 사용자 ID와 온라인 상태 목록
+ */
+exports.getUsersOnlineStatus = async (req, res) => {
+    try {
+        const users = await getUsersOnlineStatus();
+        res.json(users);
+    } catch (error) {
+        console.error('사용자 온라인 상태 조회 오류:', error);
+        res.status(500).json({ error: '사용자 온라인 상태 조회 중 오류가 발생했습니다.' });
+    }
+};
+
+/**
+ * 액세스 토큰 갱신
+ * @route POST /api/user/refresh-token
+ * @param {object} req - 요청 객체
+ * @param {object} res - 응답 객체
+ * @returns {object} 새로운 액세스 토큰
+ */
+exports.refreshAccessToken = async (req, res) => {
+    try {
+        // 쿠키에서 refreshToken 가져오기
+        const refreshToken = req.cookies.refreshToken;
+        
+        if (!refreshToken) {
+            return res.status(401).json({ error: '리프레시 토큰이 없습니다. 다시 로그인해주세요.' });
+        }
+
+        // 리프레시 토큰 검증
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        
+        // student_id로 사용자 조회
+        const user = await User.findOne({ where: { student_id: decoded.student_id } });
+        
+        if (!user) {
+            return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+        }
+
+        // 새 액세스 토큰 발급
+        const accessToken = jwt.sign(
+            { student_id: user.student_id }, 
+            process.env.JWT_ACCESS_SECRET, 
+            { expiresIn: '1h' }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: '액세스 토큰이 갱신되었습니다.',
+            accessToken
+        });
+    } catch (error) {
+        console.error('토큰 갱신 실패:', error.message);
+        
+        // 토큰 만료 에러인 경우
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ 
+                error: '리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.',
+                code: 'TOKEN_EXPIRED'
+            });
+        }
+        
+        // 기타 토큰 관련 에러
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ 
+                error: '유효하지 않은 토큰입니다. 다시 로그인해주세요.',
+                code: 'INVALID_TOKEN'
+            });
+        }
+        
+        return res.status(500).json({
+            error: '토큰 갱신 중 오류가 발생했습니다.',
             message: error.message
         });
     }

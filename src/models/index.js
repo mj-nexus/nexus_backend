@@ -13,6 +13,7 @@ const MjcNotice = require("./mjcNoticeModel");
 const Comment = require("./commentModel");
 const SeniorBoard = require("./SeniorBoard")(sequelize);
 const SeniorBoardLike = require("./SeniorBoardLike")(sequelize);
+const Notification = require("./notificationModel");
 
 
 // Board - User (1:N)
@@ -141,6 +142,36 @@ SeniorBoardLike.belongsTo(User, {
     onUpdate: 'CASCADE'
 });
 
+// User - Notification (1:N)
+User.hasMany(Notification, {
+    foreignKey: 'user_id',
+    sourceKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+Notification.belongsTo(User, {
+    foreignKey: 'user_id',
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    as: 'recipient'
+});
+
+// User - Notification (as sender) (1:N)
+User.hasMany(Notification, {
+    foreignKey: 'sender_id',
+    sourceKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+});
+Notification.belongsTo(User, {
+    foreignKey: 'sender_id',
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    as: 'sender'
+});
+
 const db = {
     sequelize,
     Sequelize,
@@ -154,7 +185,8 @@ const db = {
     MjcNotice,
     Comment,
     SeniorBoard,
-    SeniorBoardLike
+    SeniorBoardLike,
+    Notification
 };
 
 module.exports = db;

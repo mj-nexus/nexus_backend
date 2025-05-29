@@ -28,7 +28,11 @@ exports.getUserProfilesById = async (data) => {
         include: [{
             model: Profile,
             required: false  // LEFT OUTER JOIN
-        }]
+        }],
+        attributes: { 
+            include: ['user_id', 'student_id', 'onlineStatus'], 
+            exclude: ['password'] 
+        }
     });
     return res;
 }
@@ -80,4 +84,19 @@ exports.searchUsers = async (searchParams) => {
         totalPages,
         keyword
     };
+};
+
+/**
+ * 모든 사용자의 온라인 상태 조회
+ * @returns {Array} 사용자 ID와 온라인 상태 목록
+ */
+exports.getUsersOnlineStatus = async () => {
+    return await User.findAll({
+        attributes: ['user_id', 'onlineStatus'],
+        include: [{
+            model: Profile,
+            attributes: ['user_name', 'nick_name', 'profile_image'],
+            required: false
+        }]
+    });
 };
