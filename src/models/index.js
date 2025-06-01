@@ -14,6 +14,7 @@ const Comment = require("./commentModel");
 const SeniorBoard = require("./SeniorBoard")(sequelize);
 const SeniorBoardLike = require("./SeniorBoardLike")(sequelize);
 const Notification = require("./notificationModel");
+const Trash = require("./trashModel");
 
 
 // Board - User (1:N)
@@ -172,6 +173,20 @@ Notification.belongsTo(User, {
     as: 'sender'
 });
 
+// Trash - User (1:N)
+User.hasMany(Trash, {
+    foreignKey: 'writer_id',
+    sourceKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+Trash.belongsTo(User, {
+    foreignKey: 'writer_id',
+    targetKey: 'user_id',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
 const db = {
     sequelize,
     Sequelize,
@@ -186,7 +201,8 @@ const db = {
     Comment,
     SeniorBoard,
     SeniorBoardLike,
-    Notification
+    Notification,
+    Trash
 };
 
 module.exports = db;

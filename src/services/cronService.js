@@ -50,19 +50,23 @@ const crawlMjcNotices = async () => {
 
 // 크론 작업 초기화 함수
 const initCronJobs = () => {
-  // 매주 월요일 오전 9시 실행
-  cron.schedule("0 9 * * 1", () => {
-    console.log("📅 월요일 9시 - 크롤링 시작");
-    crawlMjcNotices();
-  });
-  
-  // 개발 환경에서는 서버 시작 시 바로 한 번 실행 (선택사항)
-  if (process.env.NODE_ENV === "development") {
-    console.log("🔧 개발 환경 감지 - 초기 크롤링 실행");
-    crawlMjcNotices();
+  try {
+    // 매주 월요일 오전 9시 실행 (서버 시간 기준)
+    const cronJob = cron.schedule('0 9 * * 1', () => {
+      console.log("📅 월요일 9시 - 크롤링 시작");
+      crawlMjcNotices();
+    });
+
+    console.log("⏰ 크론 작업 설정 완료");
+
+    // 개발 환경에서는 서버 시작 시 바로 한 번 실행 (선택사항)
+    if (process.env.NODE_ENV === "development") {
+      console.log("🔧 개발 환경 감지 - 초기 크롤링 실행");
+      setTimeout(crawlMjcNotices, 1000); // 1초 후에 실행하여 초기화 완료 후 실행되도록 함
+    }
+  } catch (error) {
+    console.error("❌ 크론 작업 설정 실패:", error);
   }
-  
-  console.log("⏰ 크론 작업 설정 완료");
 };
 
 module.exports = {

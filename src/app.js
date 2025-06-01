@@ -6,6 +6,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const mjcNoticeRoutes = require('./routes/mjcNoticeRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const corsMiddleware = require("./middlewares/corsMiddleware");
 const logger = require("./middlewares/logger");
@@ -34,6 +35,7 @@ app.use('/api/mjc-notices', mjcNoticeRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/senior-board', seniorBoardRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/report', reportRoutes);
 
 // 크론 작업 초기화
 cronService.initCronJobs();

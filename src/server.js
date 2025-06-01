@@ -207,7 +207,7 @@ async function sendPendingNotifications(userId) {
 // 서버 시작
 const PORT = process.env.PORT || 5000;
 
-sequelize.sync({ alter: false })
+sequelize.sync({ alter: true })
     .then(() => {
         server.listen(PORT, () => {
             console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
